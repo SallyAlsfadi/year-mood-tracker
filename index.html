@@ -9,12 +9,59 @@
     </head>
 
     <body>
-        <h1>Year Mood Tracker</h1>
-        <p>This will become an interactive daily mood tracker.</p>
-        <div id="palette"></div>
-        <button id="clear-day">Clear</button>
-        <div id="months"></div>
+
+        <header class="header">
+            <div class="title">
+                <h1>Year in Pixels</h1>
+                <p>Pick a mood, then tap a day to color it.</p>
+            </div>
+
+            <div class="controls">
+                <button id="clear-day" type="button">Clear selected</button>
+            </div>
+        </header>
+
+        <main class="layout">
+            <!-- Left: the pixel grid -->
+            <section class="card">
+                <div class="card-head">
+                    <h2 id="year-label">Year</h2>
+                    <div class="hint">Rows = day (1–31), Columns = month (J–D)</div>
+                </div>
+
+                <div id="pixels" class="pixels-wrap"></div>
+            </section>
+
+            <!-- Right: legend + stats -->
+            <aside class="side">
+                <section class="card">
+                    <h2>Legend</h2>
+                    <div id="palette" class="palette"></div>
+                </section>
+
+                <section class="card">
+                    <h2>Stats</h2>
+                    <div class="stats">
+                        <div class="stat">
+                            <div class="stat-label">Most common mood</div>
+                            <div id="stat-top-mood" class="stat-value">—</div>
+                        </div>
+
+                        <div class="stat">
+                            <div class="stat-label">Best month</div>
+                            <div id="stat-best-month" class="stat-value">—</div>
+                        </div>
+
+                        <div class="stat">
+                            <div class="stat-label">Total colored days</div>
+                            <div id="stat-total" class="stat-value">0</div>
+                        </div>
+                    </div>
+                </section>
+            </aside>
+        </main>
 
         <script src="./src/app.js"></script>
     </body>
+
 </html>
