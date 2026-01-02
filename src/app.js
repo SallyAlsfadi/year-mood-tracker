@@ -77,65 +77,73 @@ function renderPalette() {
   });
 }
 
-function renderJanuary() {
+function renderYear() {
   const monthsEl = document.getElementById("months");
   monthsEl.innerHTML = "";
 
-  const wrap = document.createElement("div");
-  wrap.className = "month";
-  wrap.innerHTML = `<h2>January ${year}</h2>`;
+  for (let monthIndex = 0; monthIndex < 12; monthIndex++) {
+    const wrap = document.createElement("div");
+    wrap.className = "month";
 
-  const grid = document.createElement("div");
-  grid.className = "grid";
-
-  // headers
-  weekdayLabels(weekStart).forEach((w) => {
-    const h = document.createElement("div");
-    h.className = "head";
-    h.textContent = w;
-    grid.appendChild(h);
-  });
-
-  const monthIndex = 0; // January
-  const offset = firstWeekdayOffset(year, monthIndex, weekStart);
-  const total = daysInMonth(year, monthIndex);
-
-  // blanks
-  for (let i = 0; i < offset; i++) {
-    const blank = document.createElement("div");
-    blank.style.visibility = "hidden";
-    grid.appendChild(blank);
-  }
-
-  // days
-  for (let d = 1; d <= total; d++) {
-    const id = `${year}-01-${String(d).padStart(2, "0")}`;
-
-    const cell = document.createElement("div");
-    cell.className = "day";
-    cell.textContent = d;
-
-    if (id === selectedDayId) {
-      cell.classList.add("selected");
-    }
-
-    const mood = dayMoods[id];
-    if (mood) {
-      cell.style.background = moodColor(mood);
-    }
-
-    cell.addEventListener("click", () => {
-      selectedDayId = id;
-      dayMoods[id] = selectedMood;
-      saveDayMoods(year, dayMoods);
-      renderJanuary();
+    const monthName = new Date(year, monthIndex, 1).toLocaleString(undefined, {
+      month: "long",
     });
 
-    grid.appendChild(cell);
-  }
+    wrap.innerHTML = `<h2>${monthName} ${year}</h2>`;
 
-  wrap.appendChild(grid);
-  monthsEl.appendChild(wrap);
+    const grid = document.createElement("div");
+    grid.className = "grid";
+
+    // headers
+    weekdayLabels(weekStart).forEach((w) => {
+      const h = document.createElement("div");
+      h.className = "head";
+      h.textContent = w;
+      grid.appendChild(h);
+    });
+
+    const offset = firstWeekdayOffset(year, monthIndex, weekStart);
+    const total = daysInMonth(year, monthIndex);
+
+    // blanks
+    for (let i = 0; i < offset; i++) {
+      const blank = document.createElement("div");
+      blank.style.visibility = "hidden";
+      grid.appendChild(blank);
+    }
+
+    // days
+    for (let d = 1; d <= total; d++) {
+      const id = `${year}-${String(monthIndex + 1).padStart(2, "0")}-${String(
+        d
+      ).padStart(2, "0")}`;
+
+      const cell = document.createElement("div");
+      cell.className = "day";
+      cell.textContent = d;
+
+      if (id === selectedDayId) {
+        cell.classList.add("selected");
+      }
+
+      const mood = dayMoods[id];
+      if (mood) {
+        cell.style.background = moodColor(mood);
+      }
+
+      cell.addEventListener("click", () => {
+        selectedDayId = id;
+        dayMoods[id] = selectedMood;
+        saveDayMoods(year, dayMoods);
+        renderYear();
+      });
+
+      grid.appendChild(cell);
+    }
+
+    wrap.appendChild(grid);
+    monthsEl.appendChild(wrap);
+  }
 }
 
 document.getElementById("clear-day").addEventListener("click", () => {
@@ -143,9 +151,8 @@ document.getElementById("clear-day").addEventListener("click", () => {
 
   delete dayMoods[selectedDayId];
   saveDayMoods(year, dayMoods);
-  renderJanuary();
+  renderYear();
 });
 
-// initial render
 renderPalette();
-renderJanuary();
+renderYear();
