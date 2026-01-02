@@ -38,7 +38,19 @@ function saveDayMoods(y, data) {
   localStorage.setItem(storageKey(y), JSON.stringify(data));
 }
 
-const dayMoods = loadDayMoods(year);
+function notesKey(y) {
+  return `year-mood-notes-${y}`;
+}
+
+function loadNotes(y) {
+  return localStorage.getItem(notesKey(y)) || "";
+}
+
+function saveNotes(y, text) {
+  localStorage.setItem(notesKey(y), text);
+}
+
+let dayMoods = loadDayMoods(year);
 
 function daysInMonth(y, monthIndex) {
   return new Date(y, monthIndex + 1, 0).getDate();
@@ -51,6 +63,8 @@ function monthLabel(monthIndex) {
 
 function renderPalette() {
   const palette = document.getElementById("palette");
+  if (!palette) return;
+
   palette.innerHTML = "";
 
   moods.forEach((mood) => {
@@ -73,53 +87,17 @@ function renderPalette() {
 
 function renderYearLabel() {
   const el = document.getElementById("year-label");
-  el.textContent = `${year}`;
+  if (el) el.textContent = `${year}`;
 }
 
 function renderPixels() {
   const container = document.getElementById("pixels");
+  if (!container) return;
+
   container.innerHTML = "";
 
   const grid = document.createElement("div");
   grid.className = "pixels-grid";
-
-  const style = document.createElement("style");
-  style.textContent = `
-      .pixels-grid{
-        display:grid;
-        grid-template-columns: 30px repeat(12, 14px);
-        gap: 4px;
-        align-items:center;
-        justify-content:start;
-        padding: 10px;
-      }
-      .px-head{
-        font-size: 11px;
-        color: #6b6b6b;
-        text-align:center;
-      }
-      .px-rowlabel{
-        font-size: 11px;
-        color: #6b6b6b;
-        text-align:right;
-        padding-right: 6px;
-      }
-      .px{
-        width: 14px;
-        height: 14px;
-        border-radius: 4px;
-        border: 1px solid rgba(0,0,0,0.10);
-        background: #fff;
-        cursor: pointer;
-      }
-      .px.off{
-        visibility:hidden;
-      }
-      .px.selected{
-        outline: 3px solid rgba(0,0,0,0.14);
-      }
-    `;
-  document.head.appendChild(style);
 
   const corner = document.createElement("div");
   corner.className = "px-head";
@@ -141,6 +119,7 @@ function renderPixels() {
 
     for (let m = 0; m < 12; m++) {
       const maxDay = daysInMonth(year, m);
+
       const id = `${year}-${String(m + 1).padStart(2, "0")}-${String(
         day
       ).padStart(2, "0")}`;
@@ -182,8 +161,9 @@ function renderStats() {
   const bestEl = document.getElementById("stat-best-month");
 
   const entries = Object.values(dayMoods);
-  totalEl.textContent = String(entries.length);
+  if (totalEl) totalEl.textContent = String(entries.length);
 
+  // most common mood
   const counts = {};
   for (const m of entries) counts[m] = (counts[m] || 0) + 1;
 
@@ -195,13 +175,15 @@ function renderStats() {
       topMood = m;
     }
   }
-  topEl.textContent = topMood ? `${moodIcon(topMood)} ${topMood}` : "—";
+  if (topEl)
+    topEl.textContent = topMood ? `${moodIcon(topMood)} ${topMood}` : "—";
 
   const score = new Array(12).fill(0);
   for (const [id, mood] of Object.entries(dayMoods)) {
     const monthIndex = parseInt(id.slice(5, 7), 10) - 1;
     if (mood === "Happy" || mood === "Success") score[monthIndex] += 1;
   }
+
   let bestIdx = -1;
   let bestScore = -1;
   for (let i = 0; i < 12; i++) {
@@ -210,24 +192,32 @@ function renderStats() {
       bestIdx = i;
     }
   }
-  if (bestScore <= 0) {
-    bestEl.textContent = "—";
-  } else {
-    const name = new Date(year, bestIdx, 1).toLocaleString(undefined, {
+
+  if (!bestEl) return;
+  if (bestScore <= 0) bestEl.textContent = "—";
+  else
+    bestEl.textContent = new Date(year, bestIdx, 1).toLocaleString(undefined, {
       month: "long",
     });
-    bestEl.textContent = `${name}`;
-  }
 }
 
-document.getElementById("clear-day").addEventListener("click", () => {
-  if (!selectedDayId) return;
+const clearBtn = document.getElementById("clear-day");
+if (clearBtn) {
+  clearBtn.addEventListener("click", () => {
+    if (!selectedDayId) return;
 
-  delete dayMoods[selectedDayId];
-  saveDayMoods(year, dayMoods);
-  renderPixels();
-  renderStats();
-});
+    delete dayMoods[selectedDayId];
+    saveDayMoods(year, dayMoods);
+    renderPixels();
+    renderStats();
+  });
+}
+
+const notesEl = document.getElementById("notes");
+if (notesEl) {
+  notesEl.value = loadNotes(year);
+  notesEl.addEventListener("input", () => saveNotes(year, notesEl.value));
+}
 
 renderPalette();
 renderYearLabel();
