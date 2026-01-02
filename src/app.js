@@ -35,3 +35,85 @@ function renderPalette() {
 }
 
 renderPalette();
+
+// --- January grid
+const year = new Date().getFullYear();
+const weekStart = 1; // 1=Monday, 0=Sunday
+
+function weekdayLabels(start) {
+  return start === 1
+    ? ["M", "T", "W", "T", "F", "S", "S"]
+    : ["S", "M", "T", "W", "T", "F", "S"];
+}
+
+function firstWeekdayOffset(y, m, start) {
+  const dow = new Date(y, m, 1).getDay(); // 0=Sun..6=Sat
+  return (dow - start + 7) % 7;
+}
+
+function daysInMonth(y, m) {
+  return new Date(y, m + 1, 0).getDate();
+}
+
+function moodColor(key) {
+  return moods.find((m) => m.key === key)?.color ?? null;
+}
+
+const dayMoods = {};
+
+function renderJanuary() {
+  const monthsEl = document.getElementById("months");
+  monthsEl.innerHTML = "";
+
+  const wrap = document.createElement("div");
+  wrap.className = "month";
+  wrap.innerHTML = `<h2>January ${year}</h2>`;
+
+  const grid = document.createElement("div");
+  grid.className = "grid";
+
+  // headers
+  weekdayLabels(weekStart).forEach((w) => {
+    const h = document.createElement("div");
+    h.className = "head";
+    h.textContent = w;
+    grid.appendChild(h);
+  });
+
+  const monthIndex = 0; // January
+  const offset = firstWeekdayOffset(year, monthIndex, weekStart);
+  const total = daysInMonth(year, monthIndex);
+
+  // blanks
+  for (let i = 0; i < offset; i++) {
+    const blank = document.createElement("div");
+    blank.style.visibility = "hidden";
+    grid.appendChild(blank);
+  }
+
+  // days
+  for (let d = 1; d <= total; d++) {
+    const id = `${year}-01-${String(d).padStart(2, "0")}`;
+
+    const cell = document.createElement("div");
+    cell.className = "day";
+    cell.textContent = d;
+
+    const mood = dayMoods[id];
+    if (mood) {
+      cell.style.background = moodColor(mood);
+    }
+
+    cell.addEventListener("click", () => {
+      dayMoods[id] = selectedMood;
+      renderJanuary();
+    });
+
+    grid.appendChild(cell);
+  }
+
+  wrap.appendChild(grid);
+  monthsEl.appendChild(wrap);
+}
+
+renderJanuary();
