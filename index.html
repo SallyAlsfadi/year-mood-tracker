@@ -23,8 +23,10 @@
         </header>
 
         <main class="layout">
-            <section class="card unified">
-                <div class="unified-left">
+            <section
+                class="card unified grid grid-cols-1 md:grid-cols-[1fr_320px] gap-6 items-stretch">
+
+                <div class="unified-left flex justify-center">
                     <div class="card-head">
                         <h2 id="year-label">Year</h2>
                         <div class="hint">Rows = day (1–31), Columns = month
@@ -34,7 +36,8 @@
                     <div id="pixels" class="pixels-wrap"></div>
                 </div>
 
-                <div class="unified-right">
+                <div class="unified-right flex flex-col gap-4 h-full">
+
                     <div class="block">
                         <h2>Legend</h2>
                         <div id="palette" class="palette"></div>
@@ -59,6 +62,14 @@
                             </div>
                         </div>
                     </div>
+                    <div class="block grow flex flex-col">
+                        <h2>Notes</h2>
+                        <textarea
+                            id="notes"
+                            placeholder="Write a short note for this year..."
+                            class="w-full grow resize-none rounded-xl border border-[var(--border)] bg-white/60 p-3 text-sm outline-none"></textarea>
+                    </div>
+
                 </div>
             </section>
         </main>
