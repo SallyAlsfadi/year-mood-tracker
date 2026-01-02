@@ -97,41 +97,49 @@ function renderPixels() {
   container.innerHTML = "";
 
   const grid = document.createElement("div");
-  grid.className = "pixels-grid";
+  grid.className = "pixels-grid months-vertical"; // (CSS later)
 
+  // ── top-left corner (empty)
   const corner = document.createElement("div");
   corner.className = "px-head";
   corner.textContent = "";
   grid.appendChild(corner);
 
-  for (let m = 0; m < 12; m++) {
+  // ── day headers (1..31)
+  for (let day = 1; day <= 31; day++) {
     const h = document.createElement("div");
     h.className = "px-head";
-    h.textContent = monthLabel(m);
+    h.textContent = String(day);
     grid.appendChild(h);
   }
 
-  for (let day = 1; day <= 31; day++) {
+  // ── month rows (Jan..Dec)
+  for (let m = 0; m < 12; m++) {
+    const monthLabel = new Date(year, m, 1)
+      .toLocaleString(undefined, { month: "short" })
+      .toUpperCase();
+
     const rowLabel = document.createElement("div");
     rowLabel.className = "px-rowlabel";
-    rowLabel.textContent = String(day);
+    rowLabel.textContent = monthLabel;
     grid.appendChild(rowLabel);
 
-    for (let m = 0; m < 12; m++) {
-      const maxDay = daysInMonth(year, m);
+    const maxDay = daysInMonth(year, m);
 
-      const id = `${year}-${String(m + 1).padStart(2, "0")}-${String(
-        day
-      ).padStart(2, "0")}`;
-
+    for (let day = 1; day <= 31; day++) {
       const cell = document.createElement("div");
       cell.className = "px";
 
+      // hide invalid days (e.g., Feb 30/31)
       if (day > maxDay) {
         cell.classList.add("off");
         grid.appendChild(cell);
         continue;
       }
+
+      const id = `${year}-${String(m + 1).padStart(2, "0")}-${String(
+        day
+      ).padStart(2, "0")}`;
 
       const mood = dayMoods[id];
       if (mood) cell.style.background = moodColor(mood);
