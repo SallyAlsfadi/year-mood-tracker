@@ -5,10 +5,11 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Year Mood Tracker</title>
+        <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="./src/styles.css">
     </head>
 
-    <body>
+    <body class="bg-[#fbfaf7]">
 
         <header class="header">
             <div class="title">
@@ -22,43 +23,44 @@
         </header>
 
         <main class="layout">
-            <!-- Left: the pixel grid -->
-            <section class="card">
-                <div class="card-head">
-                    <h2 id="year-label">Year</h2>
-                    <div class="hint">Rows = day (1–31), Columns = month (J–D)</div>
+            <section class="card unified">
+                <div class="unified-left">
+                    <div class="card-head">
+                        <h2 id="year-label">Year</h2>
+                        <div class="hint">Rows = day (1–31), Columns = month
+                            (J–D)</div>
+                    </div>
+
+                    <div id="pixels" class="pixels-wrap"></div>
                 </div>
 
-                <div id="pixels" class="pixels-wrap"></div>
-            </section>
+                <div class="unified-right">
+                    <div class="block">
+                        <h2>Legend</h2>
+                        <div id="palette" class="palette"></div>
+                    </div>
 
-            <!-- Right: legend + stats -->
-            <aside class="side">
-                <section class="card">
-                    <h2>Legend</h2>
-                    <div id="palette" class="palette"></div>
-                </section>
+                    <div class="block">
+                        <h2>Stats</h2>
+                        <div class="stats">
+                            <div class="stat">
+                                <div class="stat-label">Most common mood</div>
+                                <div id="stat-top-mood" class="stat-value">—</div>
+                            </div>
 
-                <section class="card">
-                    <h2>Stats</h2>
-                    <div class="stats">
-                        <div class="stat">
-                            <div class="stat-label">Most common mood</div>
-                            <div id="stat-top-mood" class="stat-value">—</div>
-                        </div>
+                            <div class="stat">
+                                <div class="stat-label">Best month</div>
+                                <div id="stat-best-month" class="stat-value">—</div>
+                            </div>
 
-                        <div class="stat">
-                            <div class="stat-label">Best month</div>
-                            <div id="stat-best-month" class="stat-value">—</div>
-                        </div>
-
-                        <div class="stat">
-                            <div class="stat-label">Total colored days</div>
-                            <div id="stat-total" class="stat-value">0</div>
+                            <div class="stat">
+                                <div class="stat-label">Total colored days</div>
+                                <div id="stat-total" class="stat-value">0</div>
+                            </div>
                         </div>
                     </div>
-                </section>
-            </aside>
+                </div>
+            </section>
         </main>
 
         <script src="./src/app.js"></script>
