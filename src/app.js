@@ -59,7 +59,23 @@ function moodColor(key) {
   return moods.find((m) => m.key === key)?.color ?? null;
 }
 
-const dayMoods = {};
+function storageKey(y) {
+  return `year-mood-tracker-${y}`;
+}
+
+function loadDayMoods(y) {
+  try {
+    return JSON.parse(localStorage.getItem(storageKey(y)) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveDayMoods(y, data) {
+  localStorage.setItem(storageKey(y), JSON.stringify(data));
+}
+
+const dayMoods = loadDayMoods(year);
 
 function renderJanuary() {
   const monthsEl = document.getElementById("months");
@@ -106,6 +122,7 @@ function renderJanuary() {
 
     cell.addEventListener("click", () => {
       dayMoods[id] = selectedMood;
+      saveDayMoods(year, dayMoods);
       renderJanuary();
     });
 
