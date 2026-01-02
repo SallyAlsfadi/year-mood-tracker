@@ -10,6 +10,50 @@ const moods = [
 ];
 
 let selectedMood = moods[0].key;
+let selectedDayId = null;
+
+// --- January grid settings ---
+const year = new Date().getFullYear();
+const weekStart = 1; // 1=Monday, 0=Sunday
+
+function moodColor(key) {
+  return moods.find((m) => m.key === key)?.color ?? null;
+}
+
+function weekdayLabels(start) {
+  return start === 1
+    ? ["M", "T", "W", "T", "F", "S", "S"]
+    : ["S", "M", "T", "W", "T", "F", "S"];
+}
+
+function firstWeekdayOffset(y, m, start) {
+  const dow = new Date(y, m, 1).getDay(); // 0=Sun..6=Sat
+  return (dow - start + 7) % 7;
+}
+
+function daysInMonth(y, m) {
+  return new Date(y, m + 1, 0).getDate();
+}
+
+// --- persistence (localStorage) ---
+function storageKey(y) {
+  return `year-mood-tracker-${y}`;
+}
+
+function loadDayMoods(y) {
+  try {
+    return JSON.parse(localStorage.getItem(storageKey(y)) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveDayMoods(y, data) {
+  localStorage.setItem(storageKey(y), JSON.stringify(data));
+}
+
+// state (loaded from storage)
+const dayMoods = loadDayMoods(year);
 
 function renderPalette() {
   const palette = document.getElementById("palette");
@@ -27,55 +71,11 @@ function renderPalette() {
     btn.addEventListener("click", () => {
       selectedMood = mood.key;
       renderPalette();
-      console.log("Selected mood:", selectedMood);
     });
 
     palette.appendChild(btn);
   });
 }
-
-renderPalette();
-
-// --- January grid
-const year = new Date().getFullYear();
-const weekStart = 1; // 1=Monday, 0=Sunday
-
-function weekdayLabels(start) {
-  return start === 1
-    ? ["M", "T", "W", "T", "F", "S", "S"]
-    : ["S", "M", "T", "W", "T", "F", "S"];
-}
-
-function firstWeekdayOffset(y, m, start) {
-  const dow = new Date(y, m, 1).getDay(); // 0=Sun..6=Sat
-  return (dow - start + 7) % 7;
-}
-
-function daysInMonth(y, m) {
-  return new Date(y, m + 1, 0).getDate();
-}
-
-function moodColor(key) {
-  return moods.find((m) => m.key === key)?.color ?? null;
-}
-
-function storageKey(y) {
-  return `year-mood-tracker-${y}`;
-}
-
-function loadDayMoods(y) {
-  try {
-    return JSON.parse(localStorage.getItem(storageKey(y)) || "{}");
-  } catch {
-    return {};
-  }
-}
-
-function saveDayMoods(y, data) {
-  localStorage.setItem(storageKey(y), JSON.stringify(data));
-}
-
-const dayMoods = loadDayMoods(year);
 
 function renderJanuary() {
   const monthsEl = document.getElementById("months");
@@ -115,12 +115,17 @@ function renderJanuary() {
     cell.className = "day";
     cell.textContent = d;
 
+    if (id === selectedDayId) {
+      cell.classList.add("selected");
+    }
+
     const mood = dayMoods[id];
     if (mood) {
       cell.style.background = moodColor(mood);
     }
 
     cell.addEventListener("click", () => {
+      selectedDayId = id;
       dayMoods[id] = selectedMood;
       saveDayMoods(year, dayMoods);
       renderJanuary();
@@ -133,4 +138,14 @@ function renderJanuary() {
   monthsEl.appendChild(wrap);
 }
 
+document.getElementById("clear-day").addEventListener("click", () => {
+  if (!selectedDayId) return;
+
+  delete dayMoods[selectedDayId];
+  saveDayMoods(year, dayMoods);
+  renderJanuary();
+});
+
+// initial render
+renderPalette();
 renderJanuary();
