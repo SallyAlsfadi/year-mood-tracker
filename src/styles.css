@@ -181,3 +181,16 @@ button:hover {
 .px.selected {
   outline: 2px solid rgba(0, 0, 0, 0.18) !important;
 }
+
+.px-head {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.55);
+  letter-spacing: 0.04em;
+}
+
+.px-rowlabel {
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.45);
+  padding-right: 8px;
+}
