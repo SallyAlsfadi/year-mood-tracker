@@ -1,0 +1,13 @@
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  margin: 24px;
+  color: #111;
+}
+
+h1 {
+  margin-bottom: 6px;
+}
+
+p {
+  color: #666;
+}
