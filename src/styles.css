@@ -6,6 +6,19 @@
   --border: #e7e3da;
   --shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
   --radius: 18px;
+
+  /* unified layout system */
+  --u-pad: 14px;
+  --u-gap: 16px;
+  --u-vgap: 12px;
+  --u-right: 300px;
+  --u-inner: 12px;
+  --u-radius: 16px;
+
+  /* pixels (Option B) */
+  --px-size: 18px;
+  --px-gap: 3px;
+  --px-label: 30px;
 }
 
 * {
@@ -20,6 +33,7 @@ body {
   background: var(--bg);
 }
 
+/* header */
 .header {
   display: flex;
   justify-content: space-between;
@@ -47,25 +61,22 @@ body {
   gap: 10px;
 }
 
+/* main layout (single unified block) */
 .layout {
   display: grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: 1fr;
   gap: 16px;
   padding: 16px 18px 22px;
 }
 
-@media (max-width: 900px) {
-  .layout {
-    grid-template-columns: 1fr;
-  }
-}
-
+/* base card */
 .card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 14px;
+  padding: var(--u-pad);
+  align-self: start;
 }
 
 .card h2 {
@@ -86,6 +97,7 @@ body {
   font-size: 12px;
 }
 
+/* buttons */
 button {
   padding: 10px 12px;
   border-radius: 14px;
@@ -97,6 +109,47 @@ button {
 
 button:hover {
   background: #f3efe4;
+}
+
+/* unified inside card */
+.unified {
+  display: grid;
+  grid-template-columns: 1fr var(--u-right);
+  column-gap: var(--u-gap);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .unified {
+    grid-template-columns: 1fr;
+    row-gap: var(--u-gap);
+  }
+}
+
+.unified-right {
+  display: grid;
+  gap: var(--u-vgap);
+}
+
+/* make the 3 inner areas consistent */
+.pixels-wrap,
+.block {
+  border: 1px solid var(--border);
+  border-radius: var(--u-radius);
+  padding: var(--u-inner);
+  background: #fffdf7;
+}
+
+/* pixels container should hug content */
+.pixels-wrap {
+  min-height: auto;
+  width: fit-content;
+}
+
+/* block titles */
+.block h2 {
+  margin: 0 0 8px;
+  font-size: 16px;
 }
 
 /* palette */
@@ -129,15 +182,16 @@ button:hover {
   border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
+/* stats */
 .stats {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .stat {
   border: 1px dashed var(--border);
   border-radius: 14px;
-  padding: 10px 12px;
+  padding: 8px 10px;
   background: #fffdf7;
 }
 
@@ -152,45 +206,49 @@ button:hover {
   font-weight: 600;
 }
 
-.pixels-wrap {
-  min-height: 360px;
-  border: 1px dashed var(--border);
-  border-radius: 14px;
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.02));
-}
-
+/* ===== Year in Pixels grid ===== */
 .pixels-grid {
-  grid-template-columns: 28px repeat(12, 12px) !important;
-  gap: 3px !important;
+  display: grid;
+  grid-template-columns: var(--px-label) repeat(12, var(--px-size));
+  gap: var(--px-gap);
+  align-items: center;
+  justify-content: start;
 }
 
 .px {
-  width: 12px !important;
-  height: 12px !important;
-  border-radius: 3px !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  width: var(--px-size);
+  height: var(--px-size);
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   background: #fff;
+  cursor: pointer;
   transition: transform 0.08s ease, box-shadow 0.08s ease;
 }
 
 .px:hover {
-  transform: scale(1.08);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transform: scale(1.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.px.off {
+  visibility: hidden;
 }
 
 .px.selected {
-  outline: 2px solid rgba(0, 0, 0, 0.18) !important;
+  outline: 2px solid rgba(0, 0, 0, 0.18);
 }
 
 .px-head {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
   color: rgba(0, 0, 0, 0.55);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
+  text-align: center;
 }
 
 .px-rowlabel {
   font-size: 11px;
   color: rgba(0, 0, 0, 0.45);
-  padding-right: 8px;
+  padding-right: 10px;
+  text-align: right;
 }
