@@ -24,6 +24,7 @@
   --wash-4: rgba(241, 212, 74, 0.1);
   --wash-5: rgba(255, 79, 163, 0.1);
 
+  /* Default desktop grid sizing */
   --px-size: 20px;
   --px-gap: 6px;
   --px-label: 64px;
@@ -52,6 +53,7 @@ body {
   background: var(--bg);
 }
 
+/* ===== Animations ===== */
 @keyframes gradientDrift {
   0% {
     background-position: 0% 50%;
@@ -75,6 +77,7 @@ body {
   }
 }
 
+/* ===== Header ===== */
 .header {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -102,6 +105,7 @@ body {
 
 .title h1 {
   margin: 0;
+  position: relative; /* IMPORTANT: enables ::after glow */
   font-family: "Poppins", system-ui, sans-serif;
   font-size: 48px;
   font-weight: 900;
@@ -166,6 +170,7 @@ button:hover {
   background: rgba(255, 255, 255, 0.95);
 }
 
+/* ===== Layout ===== */
 .layout {
   padding: 16px var(--pad-page) 22px;
 }
@@ -211,6 +216,7 @@ button:hover {
   justify-self: end;
 }
 
+/* ===== Mood strip ===== */
 .mood-strip {
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -302,10 +308,12 @@ button:hover {
   transform: translateY(-1px);
 }
 
+/* ===== Grid panel ===== */
 .grid-panel {
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 16px;
+
   background: radial-gradient(
       900px 420px at 12% 10%,
       var(--wash-4),
@@ -314,21 +322,26 @@ button:hover {
     radial-gradient(900px 420px at 55% 0%, var(--wash-2), transparent 55%),
     radial-gradient(900px 420px at 88% 18%, var(--wash-3), transparent 55%),
     rgba(255, 255, 255, 0.65);
+
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
   min-height: 480px;
+
+  /* RESPONSIVE FIX: allow horizontal scroll on small screens */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .pixels {
   width: 100%;
-  overflow-x: hidden;
 }
 
+/* RESPONSIVE FIX: grid should be max-content so it scrolls, not squeezes */
 .pixels-grid {
   display: grid;
   grid-template-columns: var(--px-label) repeat(31, var(--px-size));
   gap: var(--px-gap);
   align-items: center;
-  width: 100%;
+  width: max-content;
 }
 
 .px-head {
@@ -392,17 +405,61 @@ button:hover {
   outline-offset: 2px;
 }
 
+/* ===== Responsive tweaks ===== */
 @media (max-width: 960px) {
   .title h1 {
     font-size: 38px;
   }
+
   .grid-panel {
     min-height: 420px;
   }
+
   .card-top {
     grid-template-columns: 1fr;
   }
+
   .hint {
     justify-self: start;
+  }
+}
+
+/* More compact on small phones */
+@media (max-width: 720px) {
+  :root {
+    --pad-page: 14px;
+
+    /* Make cells smaller but not tiny */
+    --px-size: 16px;
+    --px-gap: 5px;
+    --px-label: 56px;
+  }
+
+  .header {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 10px;
+  }
+
+  .controls {
+    justify-content: center;
+    width: 100%;
+  }
+
+  button {
+    width: min(260px, 100%);
+  }
+}
+
+/* Very small screens */
+@media (max-width: 420px) {
+  :root {
+    --px-size: 14px;
+    --px-gap: 4px;
+    --px-label: 52px;
+  }
+
+  .title h1 {
+    font-size: 32px;
   }
 }
