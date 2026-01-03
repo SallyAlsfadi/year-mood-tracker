@@ -1,64 +1,57 @@
 const moods = [
-  { key: "Normal", color: "#8ecae6", icon: "🙂" },
-  { key: "Happy", color: "#90be6d", icon: "😊" },
-  { key: "Success", color: "#ffd166", icon: "⚡" },
-  { key: "Sad", color: "#4361ee", icon: "😔" },
-  { key: "Sick", color: "#52b788", icon: "🤒" },
-  { key: "Angry", color: "#e63946", icon: "😡" },
-  { key: "Stress", color: "#b5179e", icon: "😣" },
-  { key: "Lazy", color: "#f4a261", icon: "😴" },
+  { key: "low-energy", color: "#7b38c7" },
+  { key: "productive", color: "#ff4fa3" },
+  { key: "neutral", color: "#7f8c8d" },
+  { key: "motivated", color: "#f1d44a" },
+  { key: "stressed", color: "#1da1f2" },
+  { key: "overloaded", color: "#3ddc97" },
+  { key: "sick", color: "#f4a261" },
+  { key: "blocked", color: "#e63946" },
 ];
+
+const year = new Date().getFullYear();
+const pad2 = (n) => String(n).padStart(2, "0");
+const storageKey = (y) => `year-mood-tracker-${y}`;
+
+const loadJSON = (key, fallback) => {
+  try {
+    const v = localStorage.getItem(key);
+    return v ? JSON.parse(v) : fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const saveJSON = (key, value) =>
+  localStorage.setItem(key, JSON.stringify(value));
+const daysInMonth = (y, m) => new Date(y, m + 1, 0).getDate();
 
 let selectedMood = moods[0].key;
 let selectedDayId = null;
+let dayMoods = loadJSON(storageKey(year), {});
 
-const year = new Date().getFullYear();
+const moodMap = Object.fromEntries(moods.map((m) => [m.key, m.color]));
+const monthShort = Array.from({ length: 12 }, (_, i) =>
+  new Date(year, i, 1)
+    .toLocaleString(undefined, { month: "short" })
+    .toUpperCase()
+);
 
-function moodColor(key) {
-  return moods.find((m) => m.key === key)?.color ?? null;
-}
+function fitPixelSize() {
+  const panel = document.querySelector(".grid-panel");
+  if (!panel) return;
 
-function moodIcon(key) {
-  return moods.find((m) => m.key === key)?.icon ?? "";
-}
+  const style = getComputedStyle(document.documentElement);
+  const label = parseInt(style.getPropertyValue("--px-label"), 10) || 64;
+  const gap = parseInt(style.getPropertyValue("--px-gap"), 10) || 6;
 
-function storageKey(y) {
-  return `year-mood-tracker-${y}`;
-}
+  const panelPadding = 32;
+  const available = panel.clientWidth - panelPadding - label - gap * 31;
 
-function loadDayMoods(y) {
-  try {
-    return JSON.parse(localStorage.getItem(storageKey(y)) || "{}");
-  } catch {
-    return {};
-  }
-}
+  const px = Math.floor(available / 31);
+  const clamped = Math.max(16, Math.min(px, 28));
 
-function saveDayMoods(y, data) {
-  localStorage.setItem(storageKey(y), JSON.stringify(data));
-}
-
-function notesKey(y) {
-  return `year-mood-notes-${y}`;
-}
-
-function loadNotes(y) {
-  return localStorage.getItem(notesKey(y)) || "";
-}
-
-function saveNotes(y, text) {
-  localStorage.setItem(notesKey(y), text);
-}
-
-let dayMoods = loadDayMoods(year);
-
-function daysInMonth(y, monthIndex) {
-  return new Date(y, monthIndex + 1, 0).getDate();
-}
-
-function monthLabel(monthIndex) {
-  const labels = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
-  return labels[monthIndex];
+  document.documentElement.style.setProperty("--px-size", `${clamped}px`);
 }
 
 function renderPalette() {
@@ -67,27 +60,21 @@ function renderPalette() {
 
   palette.innerHTML = "";
 
-  moods.forEach((mood) => {
+  for (const mood of moods) {
     const btn = document.createElement("div");
-    btn.className = "mood-btn" + (mood.key === selectedMood ? " selected" : "");
-
-    btn.innerHTML = `
-        <span class="swatch" style="background:${mood.color}"></span>
-        <span>${mood.icon} ${mood.key}</span>
-      `;
-
+    btn.className = `mood-btn${mood.key === selectedMood ? " selected" : ""}`;
+    btn.innerHTML = `<span class="swatch" style="background:${mood.color}"></span><span>${mood.key}</span>`;
     btn.addEventListener("click", () => {
       selectedMood = mood.key;
       renderPalette();
     });
-
     palette.appendChild(btn);
-  });
+  }
 }
 
 function renderYearLabel() {
   const el = document.getElementById("year-label");
-  if (el) el.textContent = `${year}`;
+  if (el) el.textContent = String(year);
 }
 
 function renderPixels() {
@@ -97,63 +84,53 @@ function renderPixels() {
   container.innerHTML = "";
 
   const grid = document.createElement("div");
-  grid.className = "pixels-grid months-vertical"; // (CSS later)
+  grid.className = "pixels-grid";
 
-  // ── top-left corner (empty)
   const corner = document.createElement("div");
   corner.className = "px-head";
-  corner.textContent = "";
   grid.appendChild(corner);
 
-  // ── day headers (1..31)
-  for (let day = 1; day <= 31; day++) {
+  for (let d = 1; d <= 31; d++) {
     const h = document.createElement("div");
     h.className = "px-head";
-    h.textContent = String(day);
+    h.textContent = String(d);
     grid.appendChild(h);
   }
 
-  // ── month rows (Jan..Dec)
   for (let m = 0; m < 12; m++) {
-    const monthLabel = new Date(year, m, 1)
-      .toLocaleString(undefined, { month: "short" })
-      .toUpperCase();
-
     const rowLabel = document.createElement("div");
     rowLabel.className = "px-rowlabel";
-    rowLabel.textContent = monthLabel;
+    rowLabel.textContent = monthShort[m];
     grid.appendChild(rowLabel);
 
     const maxDay = daysInMonth(year, m);
 
-    for (let day = 1; day <= 31; day++) {
+    for (let d = 1; d <= 31; d++) {
       const cell = document.createElement("div");
       cell.className = "px";
 
-      // hide invalid days (e.g., Feb 30/31)
-      if (day > maxDay) {
+      if (d > maxDay) {
         cell.classList.add("off");
         grid.appendChild(cell);
         continue;
       }
 
-      const id = `${year}-${String(m + 1).padStart(2, "0")}-${String(
-        day
-      ).padStart(2, "0")}`;
-
+      const id = `${year}-${pad2(m + 1)}-${pad2(d)}`;
       const mood = dayMoods[id];
-      if (mood) cell.style.background = moodColor(mood);
+
+      if (mood) {
+        cell.style.background = moodMap[mood] || "";
+        cell.classList.add("filled");
+      }
 
       if (id === selectedDayId) cell.classList.add("selected");
-
-      cell.title = `${id}${mood ? ` — ${mood}` : ""}`;
+      cell.title = mood ? `${id} — ${mood}` : id;
 
       cell.addEventListener("click", () => {
         selectedDayId = id;
         dayMoods[id] = selectedMood;
-        saveDayMoods(year, dayMoods);
+        saveJSON(storageKey(year), dayMoods);
         renderPixels();
-        renderStats();
       });
 
       grid.appendChild(cell);
@@ -163,71 +140,26 @@ function renderPixels() {
   container.appendChild(grid);
 }
 
-function renderStats() {
-  const totalEl = document.getElementById("stat-total");
-  const topEl = document.getElementById("stat-top-mood");
-  const bestEl = document.getElementById("stat-best-month");
+function init() {
+  renderYearLabel();
+  renderPalette();
+  fitPixelSize();
+  renderPixels();
 
-  const entries = Object.values(dayMoods);
-  if (totalEl) totalEl.textContent = String(entries.length);
-
-  // most common mood
-  const counts = {};
-  for (const m of entries) counts[m] = (counts[m] || 0) + 1;
-
-  let topMood = null;
-  let topCount = -1;
-  for (const [m, c] of Object.entries(counts)) {
-    if (c > topCount) {
-      topCount = c;
-      topMood = m;
-    }
-  }
-  if (topEl)
-    topEl.textContent = topMood ? `${moodIcon(topMood)} ${topMood}` : "—";
-
-  const score = new Array(12).fill(0);
-  for (const [id, mood] of Object.entries(dayMoods)) {
-    const monthIndex = parseInt(id.slice(5, 7), 10) - 1;
-    if (mood === "Happy" || mood === "Success") score[monthIndex] += 1;
-  }
-
-  let bestIdx = -1;
-  let bestScore = -1;
-  for (let i = 0; i < 12; i++) {
-    if (score[i] > bestScore) {
-      bestScore = score[i];
-      bestIdx = i;
-    }
-  }
-
-  if (!bestEl) return;
-  if (bestScore <= 0) bestEl.textContent = "—";
-  else
-    bestEl.textContent = new Date(year, bestIdx, 1).toLocaleString(undefined, {
-      month: "long",
-    });
-}
-
-const clearBtn = document.getElementById("clear-day");
-if (clearBtn) {
-  clearBtn.addEventListener("click", () => {
-    if (!selectedDayId) return;
-
-    delete dayMoods[selectedDayId];
-    saveDayMoods(year, dayMoods);
+  window.addEventListener("resize", () => {
+    fitPixelSize();
     renderPixels();
-    renderStats();
   });
+
+  const clearBtn = document.getElementById("clear-day");
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      if (!selectedDayId) return;
+      delete dayMoods[selectedDayId];
+      saveJSON(storageKey(year), dayMoods);
+      renderPixels();
+    });
+  }
 }
 
-const notesEl = document.getElementById("notes");
-if (notesEl) {
-  notesEl.value = loadNotes(year);
-  notesEl.addEventListener("input", () => saveNotes(year, notesEl.value));
-}
-
-renderPalette();
-renderYearLabel();
-renderPixels();
-renderStats();
+init();

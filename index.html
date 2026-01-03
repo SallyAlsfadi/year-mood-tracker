@@ -1,80 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1.0" />
         <title>Year Mood Tracker</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet" href="./src/styles.css">
+        <link rel="stylesheet" href="./src/styles.css" />
     </head>
 
-    <body class="bg-[#fbfaf7]">
-
+    <body>
         <header class="header">
             <div class="title">
                 <h1>Year in Pixels</h1>
                 <p>Pick a mood, then tap a day to color it.</p>
             </div>
-
             <div class="controls">
-                <button id="clear-day" type="button">Clear selected</button>
+                <button id="clear-day" type="button">Clear Color</button>
             </div>
         </header>
 
         <main class="layout">
-            <section
-                class="card unified grid grid-cols-1 md:grid-cols-[1fr_320px] gap-6 items-stretch">
-
-                <div class="unified-left flex justify-center">
-                    <div class="card-head">
-                        <h2 id="year-label">Year</h2>
-                        <div class="hint">Rows = day (1–31), Columns = month
-                            (J–D)</div>
-                    </div>
-
-                    <div id="pixels" class="pixels-wrap"></div>
+            <section class="card">
+                <div class="card-top">
+                    <h2 id="year-label">Year</h2>
+                    <div class="hint"></div>
                 </div>
 
-                <div class="unified-right flex flex-col gap-4 h-full">
+                <div class="mood-strip">
+                    <div id="palette" class="palette"></div>
+                </div>
 
-                    <div class="block">
-                        <h2>Legend</h2>
-                        <div id="palette" class="palette"></div>
-                    </div>
-
-                    <div class="block">
-                        <h2>Stats</h2>
-                        <div class="stats">
-                            <div class="stat">
-                                <div class="stat-label">Most common mood</div>
-                                <div id="stat-top-mood" class="stat-value">—</div>
-                            </div>
-
-                            <div class="stat">
-                                <div class="stat-label">Best month</div>
-                                <div id="stat-best-month" class="stat-value">—</div>
-                            </div>
-
-                            <div class="stat">
-                                <div class="stat-label">Total colored days</div>
-                                <div id="stat-total" class="stat-value">0</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="block grow flex flex-col">
-                        <h2>Notes</h2>
-                        <textarea
-                            id="notes"
-                            placeholder="Write a short note for this year..."
-                            class="w-full grow resize-none rounded-xl border border-[var(--border)] bg-white/60 p-3 text-sm outline-none"></textarea>
-                    </div>
-
+                <div class="grid-panel">
+                    <div id="pixels" class="pixels"></div>
                 </div>
             </section>
         </main>
 
         <script src="./src/app.js"></script>
     </body>
-
 </html>
